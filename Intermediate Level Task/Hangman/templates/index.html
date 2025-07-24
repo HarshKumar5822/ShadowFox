@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hangman Game</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .container {
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 4px 24px rgba(44, 62, 80, 0.08);
+            padding: 2.5rem 2rem 2rem 2rem;
+            max-width: 400px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1.5rem;
+            font-size: 2.2rem;
+            letter-spacing: 2px;
+        }
+        .hangman-svg {
+            margin-bottom: 1.5rem;
+        }
+        .message {
+            color: #e74c3c;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .word-display {
+            font-size: 2.1em;
+            letter-spacing: 0.5em;
+            margin: 1.2rem 0 0.5rem 0;
+            color: #34495e;
+            font-weight: 600;
+            text-align: center;
+        }
+        .status {
+            font-size: 1.1em;
+            color: #888;
+            margin-bottom: 1.2rem;
+        }
+        .guess-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.2rem;
+        }
+        input[type="text"] {
+            font-size: 1.2em;
+            padding: 10px;
+            width: 50px;
+            text-align: center;
+            border: 2px solid #3498db;
+            border-radius: 7px;
+            margin-right: 10px;
+            outline: none;
+            transition: border 0.2s;
+        }
+        input[type="text"]:focus {
+            border: 2px solid #2980b9;
+        }
+        button {
+            font-size: 1.1em;
+            padding: 10px 22px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 7px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .play-again {
+            font-size: 1em;
+            color: #3498db;
+            text-decoration: none;
+            margin-top: 1.2rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .play-again:hover {
+            color: #217dbb;
+            text-decoration: underline;
+        }
+        @media (max-width: 500px) {
+            .container {
+                padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+            }
+            .word-display {
+                font-size: 1.3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hangman</h1>
+        <!-- Hangman SVG Drawing -->
+        <div class="hangman-svg">
+            <svg width="120" height="160" viewBox="0 0 120 160">
+                <!-- Gallows -->
+                <line x1="20" y1="150" x2="100" y2="150" stroke="#888" stroke-width="4" />
+                <line x1="40" y1="150" x2="40" y2="20" stroke="#888" stroke-width="4" />
+                <line x1="40" y1="20" x2="85" y2="20" stroke="#888" stroke-width="4" />
+                <line x1="85" y1="20" x2="85" y2="40" stroke="#888" stroke-width="4" />
+                <!-- Head -->
+                {% if incorrect_guesses > 0 %}
+                <circle cx="85" cy="52" r="12" stroke="#222" stroke-width="3" fill="none" />
+                {% endif %}
+                <!-- Body -->
+                {% if incorrect_guesses > 1 %}
+                <line x1="85" y1="64" x2="85" y2="100" stroke="#222" stroke-width="3" />
+                {% endif %}
+                <!-- Left Arm -->
+                {% if incorrect_guesses > 2 %}
+                <line x1="85" y1="75" x2="70" y2="90" stroke="#222" stroke-width="3" />
+                {% endif %}
+                <!-- Right Arm -->
+                {% if incorrect_guesses > 3 %}
+                <line x1="85" y1="75" x2="100" y2="90" stroke="#222" stroke-width="3" />
+                {% endif %}
+                <!-- Left Leg -->
+                {% if incorrect_guesses > 4 %}
+                <line x1="85" y1="100" x2="75" y2="125" stroke="#222" stroke-width="3" />
+                {% endif %}
+                <!-- Right Leg -->
+                {% if incorrect_guesses > 5 %}
+                <line x1="85" y1="100" x2="95" y2="125" stroke="#222" stroke-width="3" />
+                {% endif %}
+            </svg>
+        </div>
+        {% if message %}
+            <div class="message">{{ message }}</div>
+        {% endif %}
+        <div class="word-display">{{ display_word }}</div>
+        <div class="status">Incorrect guesses: {{ incorrect_guesses }} / {{ max_attempts }}</div>
+        {% if not session.get('game_over') %}
+        <form method="post" class="guess-form">
+            <input type="text" name="guess" maxlength="1" required autocomplete="off" autofocus>
+            <button type="submit">Guess</button>
+        </form>
+        {% endif %}
+        <a href="{{ url_for('reset_game') }}" class="play-again">Play Again</a>
+    </div>
+</body>
+</html>
